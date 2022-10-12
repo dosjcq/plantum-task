@@ -10,18 +10,21 @@
 
     <v-main>
       <EmployeeForm />
+      <EmployeeList />
     </v-main>
   </v-app>
 </template>
 
 <script>
 import EmployeeForm from "./components/EmployeeForm.vue";
+import EmployeeList from "./components/EmployeeList.vue";
 
 export default {
   name: "App",
 
   components: {
     EmployeeForm,
+    EmployeeList,
   },
 
   data: () => ({
