@@ -8,9 +8,22 @@
       <span class="mr-2">Test task</span>
     </v-app-bar>
 
-    <v-main>
-      <EmployeeForm />
-      <EmployeeList />
+    <v-main class="mt-10">
+      <v-container>
+        <v-row align-content="start" justify="center">
+          <v-card>
+            <v-btn
+              color="primary"
+              block
+              @click="isFormVisible = !isFormVisible"
+            >
+              {{ isFormVisible ? "Закрыть форму" : "Открыть форму" }}
+            </v-btn>
+            <EmployeeList />
+          </v-card>
+          <EmployeeForm v-if="isFormVisible" />
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -28,7 +41,7 @@ export default {
   },
 
   data: () => ({
-    //
+    isFormVisible: false,
   }),
 };
 </script>

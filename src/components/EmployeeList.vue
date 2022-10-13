@@ -1,30 +1,22 @@
 <template>
   <v-data-table
     :headers="dessertHeaders"
-    :items="employees"
+    :items="getEmployeesList"
     :single-expand="singleExpand"
     :expanded.sync="expanded"
     item-key="id"
     show-expand
     :custom-sort="customSort"
     class="elevation-1"
+    :footer-props="{
+      'items-per-page-text': 'Количество работников на странице',
+    }"
   >
-    <template v-slot:top>
-      <v-toolbar flat>
-        <v-toolbar-title>Expandable Table</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-switch
-          v-model="singleExpand"
-          label="Single expand"
-          class="mt-2"
-        ></v-switch>
-      </v-toolbar>
-    </template>
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
         <v-treeview :items="item.children" activatable transition>
-          <template v-slot:prepend="{ item }">
-            <v-icon v-if="!item.children"> mdi-account </v-icon>
+          <template v-slot:label="{ item }">
+            <span>{{ item.name + " " + item.number }}</span>
           </template>
         </v-treeview>
       </td>
@@ -33,131 +25,64 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data() {
     return {
       expanded: [],
-      singleExpand: false,
+      singleExpand: true,
       dessertHeaders: [
         {
-          text: "Name",
+          text: "Имя",
           align: "start",
           value: "name",
         },
-        { text: "Number", value: "number" },
+        { text: "Номер телефона", value: "number" },
         { text: "", value: "data-table-expand" },
-      ],
-
-      employees: [
-        {
-          name: "Artem",
-          number: 7,
-          id: 0,
-          children: [
-            {
-              name: "Avan",
-              number: 6,
-              id: 11,
-            },
-            {
-              name: "Cvanik",
-              number: 5,
-              id: 12,
-              children: [
-                {
-                  name: "Dvan",
-                  number: 4,
-                  id: 111,
-                },
-                {
-                  name: "Bvanik",
-                  number: 3,
-                  id: 121,
-                },
-              ],
-            },
-          ],
-        },
-        {
-          name: "Antonio",
-          number: 2,
-          id: 2,
-          children: [
-            {
-              name: "Avan",
-              number: 1,
-              id: 11,
-            },
-          ],
-        },
-        ,
       ],
     };
   },
+  computed: {
+    ...mapGetters(["getEmployeesList"]),
+  },
   methods: {
     customSort(items, index, isDesc) {
-      console.log(index);
       if (index[0] === "name") {
-        if (isDesc[0]) {
-          return items.sort(this.sortASCByName);
-        } else {
-          return items.sort(this.sortDESCByName);
-        }
+        return items.sort(this.sortByName(isDesc[0]));
       } else {
-        if (isDesc[0]) {
-          return items.sort(this.sortASCByName);
-        } else {
-          return items.sort(this.sortDESCByName);
+        return items.sort(this.sortByNumber(isDesc[0]));
+      }
+    },
+
+    sortByName(isDesc) {
+      return (a, b) => {
+        if (!!a.children) {
+          a.children.sort(this.sortByName(isDesc));
         }
-      }
+        if (!!b.children) {
+          b.children.sort(this.sortByName(isDesc));
+        }
+
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        return isDesc ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      };
     },
 
-    sortASCByName(a, b) {
-      console.log(a, b);
+    sortByNumber(isDesc) {
+      return (a, b) => {
+        if (!!a.children) {
+          a.children.sort(this.sortByNumber(isDesc));
+        }
+        if (!!b.children) {
+          b.children.sort(this.sortByNumber(isDesc));
+        }
 
-      if (!!a.children) {
-        a.children.sort(this.sortASCByName);
-      }
-      if (!!b.children) {
-        b.children.sort(this.sortASCByName);
-      }
-
-      const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-      const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-      return nameA.localeCompare(nameB);
-    },
-    sortDESCByName(a, b) {
-      if (!!a.children) {
-        a.children.sort(this.sortDESCByName);
-      }
-      if (!!b.children) {
-        b.children.sort(this.sortDESCByName);
-      }
-
-      const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-      const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-      return nameB.localeCompare(nameA);
-    },
-
-    sortASCByNumber(a, b) {
-      if (!!a.children) {
-        a.children.sort(this.sortASCByNumber);
-      }
-      if (!!b.children) {
-        b.children.sort(this.sortASCByNumber);
-      }
-
-      return a - b;
-    },
-    sortDESCByNumber(a, b) {
-      if (!!a.children) {
-        a.children.sort(this.sortDESCByNumber);
-      }
-      if (!!b.children) {
-        b.children.sort(this.sortDESCByNumber);
-      }
-
-      return b - a;
+        return isDesc
+          ? Number(a.number) - Number(b.number)
+          : Number(b.number) - Number(a.number);
+      };
     },
   },
 };
