@@ -6,8 +6,8 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    employees: [],
-    selectList: [],
+    employees: JSON.parse(window.localStorage.getItem("employees")) || [],
+    selectList: JSON.parse(window.localStorage.getItem("selectList")) || [],
   },
   getters: {
     getEmployeesList: (state) => state.employees,
@@ -38,7 +38,7 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    addNewEmployee: ({ commit }, payload) => {
+    addNewEmployee: ({ commit, state }, payload) => {
       const newEmployee = {
         id: uuidv4(),
         ...payload,
@@ -49,6 +49,12 @@ export default new Vuex.Store({
       } else {
         commit("addItem", newEmployee);
       }
+
+      window.localStorage.setItem("employees", JSON.stringify(state.employees));
+      window.localStorage.setItem(
+        "selectList",
+        JSON.stringify(state.selectList)
+      );
     },
   },
 });
