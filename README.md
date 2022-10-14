@@ -1,19 +1,11 @@
-# my-app
+# plantum test
 
 ## Project setup
-```
-npm install
-```
+```npm install``` to install all dependencies
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+```git checkout dev``` to switch to development branch
 
-### Compiles and minifies for production
-```
-npm run build
-```
+```npm run serve``` to run dev server
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+
+```npm run build``` to build project
